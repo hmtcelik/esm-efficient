@@ -34,6 +34,7 @@ image = (
     .run_commands(
         "pip install git+https://github.com/MuhammedHasan/fair-esm.git",
     )
+    .copy_local_dir(".", "/app")
 )
 
 # Cache downloaded model weights across runs (~800MB total)
@@ -43,7 +44,6 @@ model_cache = modal.Volume.from_name("esm-model-cache", create_if_missing=True)
 @app.function(
     gpu="L4",
     image=image,
-    mounts=[modal.Mount.from_local_dir(".", remote_path="/app")],
     volumes={"/model-cache": model_cache},
     timeout=3600,
 )

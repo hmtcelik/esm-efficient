@@ -7,7 +7,7 @@ image = (
         "nvidia/cuda:12.8.0-devel-ubuntu22.04",
         add_python="3.11",
     )
-    .apt_install("git")
+    .apt_install("git", "build-essential")
     .pip_install(
         "packaging",
         "ninja",

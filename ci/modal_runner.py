@@ -9,11 +9,12 @@ image = (
     )
     .apt_install("git")
     .pip_install(
+        "packaging",
+        "ninja",
         "torch>=2.7.0",
         extra_index_url="https://download.pytorch.org/whl/cu128",
     )
     .run_commands(
-        "pip install packaging",
         "pip install flash-attn --no-build-isolation",
         gpu="L4",
     )

@@ -11,6 +11,8 @@ image = (
     .pip_install(
         "packaging",
         "ninja",
+        "wheel",
+        "setuptools",
         "torch>=2.7.0",
         extra_index_url="https://download.pytorch.org/whl/cu128",
     )

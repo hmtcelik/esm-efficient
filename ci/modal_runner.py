@@ -7,6 +7,7 @@ image = (
         "nvidia/cuda:12.8.0-devel-ubuntu22.04",
         add_python="3.11",
     )
+    .apt_install("git")
     .pip_install(
         "torch>=2.7.0",
         extra_index_url="https://download.pytorch.org/whl/cu128",
@@ -34,7 +35,6 @@ image = (
     .run_commands(
         "pip install git+https://github.com/MuhammedHasan/fair-esm.git",
     )
-    .copy_local_dir(".", "/app")
 )
 
 # Cache downloaded model weights across runs (~800MB total)
@@ -47,12 +47,14 @@ model_cache = modal.Volume.from_name("esm-model-cache", create_if_missing=True)
     volumes={"/model-cache": model_cache},
     timeout=3600,
 )
-def run_tests():
+def run_tests(repo_url: str, ref: str):
     import os
     import shutil
     import subprocess
 
-    os.chdir("/app")
+    # Clone the repo at the specific commit
+    subprocess.run(["git", "clone", repo_url, "/app"], check=True)
+    subprocess.run(["git", "checkout", ref], cwd="/app", check=True)
 
     # Restore cached model weights to avoid re-downloading each run
     cache_dir = "/model-cache/test-data"
@@ -63,10 +65,10 @@ def run_tests():
             shutil.copy2(f"{cache_dir}/{fname}", dst)
 
     # Install the package itself
-    subprocess.run(["pip", "install", "-e", "."], check=True)
+    subprocess.run(["pip", "install", "-e", "."], cwd="/app", check=True)
 
     # Run tests
-    result = subprocess.run(["pytest", "tests/", "-v", "--tb=short"])
+    result = subprocess.run(["pytest", "tests/", "-v", "--tb=short"], cwd="/app")
 
     # Save newly downloaded models to cache
     for fname in os.listdir("/app/tests/data"):
@@ -81,5 +83,8 @@ def run_tests():
 
 
 @app.local_entrypoint()
-def main():
-    run_tests.remote()
+def main(
+    repo_url: str = "https://github.com/hmtcelik/esm-efficient.git",
+    ref: str = "master",
+):
+    run_tests.remote(repo_url, ref)

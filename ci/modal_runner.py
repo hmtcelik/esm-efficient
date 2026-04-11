@@ -14,6 +14,7 @@ image = (
         "wheel",
         "setuptools",
         "torch>=2.7.0",
+        "torchvision",
         extra_index_url="https://download.pytorch.org/whl/cu128",
     )
     .run_commands(

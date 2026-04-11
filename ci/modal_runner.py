@@ -35,6 +35,7 @@ image = (
         "pytest-runner",
         "pooch",
         "esm",
+        "httpx",
     )
     .run_commands(
         "pip install git+https://github.com/MuhammedHasan/fair-esm.git",

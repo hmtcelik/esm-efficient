@@ -37,9 +37,12 @@ image = (
         "pooch",
         "esm",
         "httpx",
+        "bitsandbytes",
     )
     .run_commands(
         "pip install git+https://github.com/MuhammedHasan/fair-esm.git",
+        # Patch fair-esm for PyTorch 2.6+ compatibility (weights_only default changed)
+        "sed -i 's/torch.load(str(model_location), map_location=\"cpu\")/torch.load(str(model_location), map_location=\"cpu\", weights_only=False)/' /usr/local/lib/python3.11/site-packages/fair_esm/pretrained.py",
     )
 )
 
